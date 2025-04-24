@@ -10,7 +10,7 @@ enum AppThemeMode {
 class ThemeProvider with ChangeNotifier {
   AppThemeMode _themeMode = AppThemeMode.light;
   bool _isLargeText = false;
-  bool _isHintsEnabled = true;
+  bool _isHintsEnabled = false;
   Locale _locale = const Locale('ru'); // по умолчанию русский
 
   AppThemeMode get themeMode => _themeMode;
@@ -35,27 +35,24 @@ class ThemeProvider with ChangeNotifier {
         base = AppTheme.lightTheme;
     }
 
-    // Модифицируем размеры шрифта и кнопок при необходимости
-    if (_isLargeText) {
-      return base.copyWith(
-        textTheme: base.textTheme.copyWith(
-          titleLarge: base.textTheme.titleLarge?.copyWith(fontSize: 24),
-          bodyMedium: base.textTheme.bodyMedium?.copyWith(fontSize: 18),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: base.elevatedButtonTheme.style?.copyWith(
-            padding: MaterialStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-            ),
-            textStyle: MaterialStateProperty.all(
-              const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+    // Возвращаем тему с учётом режима подсказок
+    return AppTheme.getThemeWithHintsEnabled(base, _isHintsEnabled).copyWith(
+      // Модифицируем размеры шрифта и кнопок при необходимости
+      textTheme: base.textTheme.copyWith(
+        titleLarge: base.textTheme.titleLarge?.copyWith(fontSize: _isLargeText ? 24 : 20),
+        bodyMedium: base.textTheme.bodyMedium?.copyWith(fontSize: _isLargeText ? 18 : 16),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: base.elevatedButtonTheme.style?.copyWith(
+          padding: MaterialStateProperty.all(
+            EdgeInsets.symmetric(horizontal: _isLargeText ? 28 : 24, vertical: _isLargeText ? 16 : 12),
+          ),
+          textStyle: MaterialStateProperty.all(
+            TextStyle(fontSize: _isLargeText ? 18 : 14, fontWeight: FontWeight.bold),
           ),
         ),
-      );
-    }
-
-    return base;
+      ),
+    );
   }
 
   void setThemeMode(AppThemeMode mode) {

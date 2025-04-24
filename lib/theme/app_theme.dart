@@ -28,6 +28,10 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.all(Colors.teal),
+      trackColor: MaterialStateProperty.all(Colors.teal.withOpacity(0.5)),
+    ),
   );
 
   static final ThemeData darkTheme = ThemeData(
@@ -58,6 +62,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.all(Colors.teal),
+      trackColor: MaterialStateProperty.all(Colors.teal.withOpacity(0.5)),
     ),
   );
 
@@ -96,8 +104,8 @@ class AppTheme {
       labelStyle: TextStyle(color: Colors.yellowAccent),
     ),
     switchTheme: SwitchThemeData(
-      thumbColor: WidgetStateProperty.all(Colors.yellowAccent),
-      trackColor: WidgetStateProperty.all(Colors.grey),
+      thumbColor: MaterialStateProperty.all(Colors.yellowAccent),
+      trackColor: MaterialStateProperty.all(Colors.grey),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -114,4 +122,26 @@ class AppTheme {
       secondary: Colors.orangeAccent,
     ),
   );
+
+  // Функция для обновления подсветки элементов при включенном режиме подсказок
+  static ThemeData getThemeWithHintsEnabled(ThemeData baseTheme, bool isHintsEnabled) {
+    if (!isHintsEnabled) return baseTheme;
+
+    // Включаем подсветку только в режиме подсказок, остальные элементы оставляем как в базовой теме
+    return baseTheme.copyWith(
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.yellow, // Жёлтый фон для кнопок в режиме подсказок
+          foregroundColor: Colors.black,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.all(Colors.yellow), // Подсветка для переключателей
+        trackColor: MaterialStateProperty.all(Colors.yellow.withOpacity(0.5)),
+      ),
+    );
+  }
 }
