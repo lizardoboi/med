@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:med/data/models/medicine_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:med/domain/models/medicine_model.dart';
+import 'package:med/domain/providers/medicine_provider.dart';
 import 'package:provider/provider.dart';
 import '../../utils/notification_service.dart';
-import '../../data/providers/medicine_provider.dart';
 import '../home/widgets/custom_bottom_navigation_bar.dart';
 import '../home/widgets/medicine_search_field.dart';
 import '../home/widgets/medicine_tile.dart';
-import '../../routes.dart'; // Убедись, что путь правильный
+import '../../routes.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -28,15 +29,15 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final medicineProvider = Provider.of<MedicineProvider>(context);
-
     final filteredMedicines = medicineProvider.medicines.where((medicine) {
       return medicine.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Medication Reminder'),
+        title: Text(loc.appTitle),
         leading: IconButton(
           icon: const Icon(Icons.account_circle),
           onPressed: () {
@@ -66,9 +67,9 @@ class _MainScreenState extends State<MainScreen> {
             const SizedBox(height: 16.0),
             Expanded(
               child: medicineProvider.medicines.isEmpty
-                  ? const Center(child: Text('Нет записей о лекарствах'))
+                  ? Center(child: Text(loc.noMedicineRecords))
                   : filteredMedicines.isEmpty
-                  ? const Center(child: Text('Лекарство не найдено'))
+                  ? Center(child: Text(loc.medicineNotFound))
                   : ListView.builder(
                 itemCount: filteredMedicines.length,
                 itemBuilder: (context, index) {
@@ -80,45 +81,40 @@ class _MainScreenState extends State<MainScreen> {
                     medicine: med,
                     onReminderChanged: (val) async {
                       final updated = med.copyWith(reminder: val);
-                      medicineProvider.updateMedicine(
-                          originalIndex, updated);
+                      medicineProvider.updateMedicine(originalIndex, updated);
 
                       if (val) {
                         await NotificationService.scheduleNotification(
-                          title: 'Напоминание о лекарстве',
-                          body:
-                          'Пора принять: ${med.name} (${med.condition})',
+                          title: loc.reminderTitle,
+                          body: loc.reminderBody(med.name, med.condition),
                           time: med.time,
                           date: med.startDate,
                           id: med.notificationId,
                           repeats: med.reminder,
                         );
                       } else {
-                        await NotificationService.cancelNotification(
-                            med.notificationId);
+                        await NotificationService.cancelNotification(med.notificationId);
                       }
                     },
-                      onTap: () async {
-                        final updatedMedicine = await Navigator.pushNamed(
-                          context,
-                          Routes.addMedicineScreen,
-                          arguments: med,  // Передаем лекарство для редактирования
-                        );
+                    onTap: () async {
+                      final updatedMedicine = await Navigator.pushNamed(
+                        context,
+                        Routes.addMedicineScreen,
+                        arguments: med,
+                      );
 
-                        if (updatedMedicine != null && updatedMedicine is Medicine) {
-                          // Обновляем существующую запись в Provider
-                          final originalIndex = medicineProvider.medicines.indexOf(med);
-                          if (originalIndex != -1) {
-                            medicineProvider.updateMedicine(originalIndex, updatedMedicine); // Обновляем в списке
-                          }
+                      if (updatedMedicine != null && updatedMedicine is Medicine) {
+                        final originalIndex = medicineProvider.medicines.indexOf(med);
+                        if (originalIndex != -1) {
+                          medicineProvider.updateMedicine(originalIndex, updatedMedicine);
                         }
-                      },
+                      }
+                    },
                     onDismissed: () async {
-                      await NotificationService.cancelNotification(
-                          med.notificationId);
+                      await NotificationService.cancelNotification(med.notificationId);
                       medicineProvider.deleteMedicine(originalIndex);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Medicine deleted')),
+                        SnackBar(content: Text(loc.medicineDeleted)),
                       );
                     },
                   );

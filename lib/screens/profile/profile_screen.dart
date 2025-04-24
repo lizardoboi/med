@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:med/domain/models/profile_model.dart';
+import 'package:med/domain/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
-import '../../../data/providers/profile_provider.dart';
-import '../../../data/models/profile_model.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -18,15 +19,16 @@ class ProfileScreen extends StatelessWidget {
 
   Future<void> _addProfile(BuildContext context) async {
     final nameController = TextEditingController();
+    final loc = AppLocalizations.of(context)!;
 
     await showDialog(
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: const Text('Новый профиль'),
+          title: Text(loc.newProfile),
           content: TextField(
             controller: nameController,
-            decoration: const InputDecoration(labelText: 'Имя профиля'),
+            decoration: InputDecoration(labelText: loc.profileNameLabel),
           ),
           actions: [
             TextButton(
@@ -39,7 +41,7 @@ class ProfileScreen extends StatelessWidget {
                   Navigator.pop(context);
                 }
               },
-              child: const Text('Создать'),
+              child: Text(loc.create),
             ),
           ],
         );
@@ -53,20 +55,22 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Future<void> _deleteProfile(BuildContext context, Profile profile) async {
+    final loc = AppLocalizations.of(context)!;
+
     final confirmDelete = await showDialog<bool>(
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: const Text('Удалить профиль'),
-          content: const Text('Вы уверены, что хотите удалить этот профиль?'),
+          title: Text(loc.deleteProfile),
+          content: Text(loc.deleteProfileConfirmation),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Отмена'),
+              child: Text(loc.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Удалить'),
+              child: Text(loc.delete),
             ),
           ],
         );
@@ -80,26 +84,29 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final profileProvider = Provider.of<ProfileProvider>(context);
     final profiles = profileProvider.profiles;
     final active = profileProvider.activeProfile;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Профиль')),
+      appBar: AppBar(title: Text(loc.profileScreenTitle)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: active == null
-              ? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('Нет активного профиля'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => _addProfile(context),
-                child: const Text('Создать профиль'),
-              ),
-            ],
+              ? Center(  // Сделаем добавление нового профиля по центру
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(loc.noActiveProfile),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => _addProfile(context),
+                  child: Text(loc.createProfile),
+                ),
+              ],
+            ),
           )
               : SingleChildScrollView(
             child: Column(
@@ -110,10 +117,8 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 40,
-                        backgroundColor:
-                        _getColorForProfile(active, profiles),
-                        child: const Icon(Icons.person,
-                            size: 40, color: Colors.white),
+                        backgroundColor: _getColorForProfile(active, profiles),
+                        child: const Icon(Icons.person, size: 40, color: Colors.white),
                       ),
                       const SizedBox(height: 12),
                       Text(
@@ -127,10 +132,7 @@ class ProfileScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Сменить профиль',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    Text(loc.switchProfile, style: const TextStyle(fontWeight: FontWeight.bold)),
                     IconButton(
                       icon: const Icon(Icons.add),
                       onPressed: () => _addProfile(context),
@@ -149,7 +151,7 @@ class ProfileScreen extends StatelessWidget {
                         ? const Icon(Icons.check, color: Colors.teal)
                         : null,
                     onTap: () => profileProvider.switchProfile(p),
-                    onLongPress: () => _deleteProfile(context, p), // Удаление профиля по долгому нажатию
+                    onLongPress: () => _deleteProfile(context, p),
                   );
                 }).toList(),
                 const SizedBox(height: 30),

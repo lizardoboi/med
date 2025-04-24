@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RepeatDailySwitch extends StatelessWidget {
   final bool value;
@@ -12,9 +13,11 @@ class RepeatDailySwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Row(
       children: [
-        const Text('Повторять ежедневно'),
+        Text(localizations.repeatDaily), // Локализованная строка
         Switch(
           value: value,
           onChanged: onChanged,

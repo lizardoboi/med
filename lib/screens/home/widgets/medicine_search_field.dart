@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MedicineSearchField extends StatelessWidget {
   final ValueChanged<String> onChanged;
@@ -10,12 +11,14 @@ class MedicineSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return TextField(
       onChanged: onChanged,
-      decoration: const InputDecoration(
-        labelText: 'Search Medicine',
-        prefixIcon: Icon(Icons.search),
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: localizations.searchMedicine,
+        prefixIcon: const Icon(Icons.search),
+        border: const OutlineInputBorder(),
       ),
     );
   }

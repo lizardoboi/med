@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:med/domain/models/medicine_model.dart';
 import 'package:med/screens/history/history_screen.dart';
-import 'data/models/medicine_model.dart';
 import 'screens/home/main_screen.dart';
 import 'screens/add_medicine/add_medicine_screen.dart';
 import 'screens/settings/settings_screen.dart';
@@ -18,7 +18,6 @@ class Routes {
       case mainScreen:
         return MaterialPageRoute(builder: (_) => const MainScreen());
       case addMedicineScreen:
-      // Передаем аргументы в AddMedicineScreen, если они есть
         final medicine = settings.arguments as Medicine?;
         return MaterialPageRoute(
           builder: (_) => AddMedicineScreen(medicine: medicine),

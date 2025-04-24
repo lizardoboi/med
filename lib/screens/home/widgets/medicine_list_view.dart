@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../data/models/medicine_model.dart';
+import 'package:med/domain/models/medicine_model.dart';
 import 'medicine_tile.dart';
 
 class MedicineListView extends StatelessWidget {

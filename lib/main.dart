@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:med/data/providers/profile_provider.dart';
+import 'package:med/domain/providers/medicine_provider.dart';
+import 'package:med/domain/providers/missed_dose_provider.dart';
+import 'package:med/domain/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'theme/theme_provider.dart';
-import 'data/providers/medicine_provider.dart';
-import 'data/providers/missed_dose_provider.dart'; // Импортируем MissedDoseProvider
 import 'routes.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // импорт локализаци
 
 void main() => runApp(
   MultiProvider(
@@ -43,9 +45,23 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       title: 'Medication Reminder',
       theme: themeProvider.currentTheme,
+      locale: themeProvider.locale, // 👈 текущая выбранная локаль
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ru'),
+        Locale('fi'),
+        Locale('es'),
+      ],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       initialRoute: Routes.mainScreen,
       onGenerateRoute: Routes.generateRoute,
     );

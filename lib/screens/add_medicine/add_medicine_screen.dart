@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:med/domain/models/medicine_model.dart';
+import 'package:med/domain/providers/medicine_provider.dart';
 import 'package:provider/provider.dart';
-import '../../data/models/medicine_model.dart';
 import '../../utils/notification_service.dart';
-import '../../data/providers/medicine_provider.dart';
 import 'widgets/condition_button.dart';
 import 'widgets/date_picker_tile.dart';
 import 'widgets/repeat_daily_switch.dart';
@@ -26,11 +27,11 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   DateTime _selectedDate = DateTime.now();
   bool _repeatDaily = false;
 
-  final List<String> _conditions = [
-    'До еды',
-    'После еды',
-    'Перед сном',
-    'Утром',
+  List<String> _conditions(BuildContext context) => [
+    AppLocalizations.of(context)!.beforeMeal,
+    AppLocalizations.of(context)!.afterMeal,
+    AppLocalizations.of(context)!.beforeSleep,
+    AppLocalizations.of(context)!.morning,
   ];
 
   @override
@@ -44,7 +45,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       _selectedCondition = _existingMedicine!.condition;
       _selectedTime = _existingMedicine!.time;
       _selectedDate = _existingMedicine!.startDate;
-      _repeatDaily = _existingMedicine!.repeatDaily; // ⚠️ используется repeatDaily
+      _repeatDaily = _existingMedicine!.repeatDaily;
     }
   }
 
@@ -85,15 +86,17 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
         condition: _selectedCondition!,
         time: _selectedTime,
         startDate: _selectedDate,
-        reminder: isEditing ? _existingMedicine!.reminder : true, // оставляем как было
+        reminder: isEditing ? _existingMedicine!.reminder : true,
         repeatDaily: _repeatDaily,
         notificationId: notificationId,
       );
 
-      final medicineProvider = Provider.of<MedicineProvider>(context, listen: false);
+      final medicineProvider =
+      Provider.of<MedicineProvider>(context, listen: false);
 
       if (isEditing) {
-        final originalIndex = medicineProvider.medicines.indexOf(_existingMedicine!);
+        final originalIndex =
+        medicineProvider.medicines.indexOf(_existingMedicine!);
         if (originalIndex != -1) {
           medicineProvider.updateMedicine(originalIndex, updatedMedicine);
         }
@@ -101,11 +104,13 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
         medicineProvider.addMedicine(updatedMedicine);
       }
 
-      // Планируем уведомление только если reminder включён
       if (updatedMedicine.reminder) {
         await NotificationService.scheduleNotification(
-          title: 'Напоминание о лекарстве',
-          body: 'Пора принять: $name ($_selectedCondition)',
+          title: AppLocalizations.of(context)!.reminderTitle,
+          body: AppLocalizations.of(context)!.reminderBody(
+            updatedMedicine.name,
+            updatedMedicine.condition,
+          ),
           time: _selectedTime,
           date: _selectedDate,
           id: notificationId,
@@ -116,7 +121,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       Navigator.pop(context, updatedMedicine);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пожалуйста, заполните все поля')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseFillAllFields)),
       );
     }
   }
@@ -124,10 +129,13 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = _existingMedicine != null;
+    final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Редактировать лекарство' : 'Добавить лекарство'),
+        title: Text(isEditing
+            ? localizations.editMedicine
+            : localizations.addMedicine),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -135,15 +143,15 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
           children: [
             TextField(
               controller: _controller,
-              decoration: const InputDecoration(
-                labelText: 'Название лекарства',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: localizations.medicineName,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16.0),
             Wrap(
               spacing: 8.0,
-              children: _conditions.map((condition) {
+              children: _conditions(context).map((condition) {
                 return ConditionButton(
                   label: condition,
                   isActive: _selectedCondition == condition,
@@ -174,7 +182,9 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: _saveMedicine,
-              child: Text(isEditing ? 'Сохранить изменения' : 'Сохранить'),
+              child: Text(isEditing
+                  ? localizations.saveChanges
+                  : localizations.create),
             ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../../theme/theme_provider.dart';
 
@@ -8,26 +9,28 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final loc = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text(loc.settingsTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          const Text(
-            'App Preferences',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Text(
+            loc.appPreferences,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
 
-          /// 🔘 Language Selector
           ListTile(
-            title: const Text('Language'),
+            title: Text(loc.language),
             trailing: DropdownButton<String>(
               value: themeProvider.locale.languageCode,
-              items: const [
-                DropdownMenuItem(value: 'en', child: Text('English')),
-                DropdownMenuItem(value: 'ru', child: Text('Русский')),
+              items: [
+                DropdownMenuItem(value: 'en', child: Text(loc.english)),
+                DropdownMenuItem(value: 'ru', child: Text(loc.russian)),
+                DropdownMenuItem(value: 'fi', child: Text(loc.finnish)),
+                DropdownMenuItem(value: 'es', child: Text(loc.spanish)),
               ],
               onChanged: (value) {
                 if (value != null) {
@@ -37,9 +40,8 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
 
-          /// 🌙 Dark Theme
           ListTile(
-            title: const Text('Dark Theme'),
+            title: Text(loc.darkTheme),
             trailing: Switch(
               value: themeProvider.isDarkMode,
               onChanged: (bool value) {
@@ -50,9 +52,8 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
 
-          /// ⚫ High Contrast
           ListTile(
-            title: const Text('High Contrast Theme'),
+            title: Text(loc.highContrast),
             trailing: Switch(
               value: themeProvider.isHighContrast,
               onChanged: (bool value) {
@@ -63,9 +64,8 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
 
-          /// 🔠 Large Buttons & Text
           ListTile(
-            title: const Text('Large Buttons & Text'),
+            title: Text(loc.largeText),
             trailing: Switch(
               value: themeProvider.isLargeText,
               onChanged: (bool value) {
@@ -74,9 +74,8 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
 
-          /// 💡 Hints Mode
           ListTile(
-            title: const Text('Hints Mode'),
+            title: Text(loc.hintsMode),
             trailing: Switch(
               value: themeProvider.isHintsEnabled,
               onChanged: (bool value) {

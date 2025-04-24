@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DatePickerTile extends StatelessWidget {
   final DateTime selectedDate;
@@ -12,8 +13,10 @@ class DatePickerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return ListTile(
-      title: const Text('Дата начала'),
+      title: Text(localizations.startDate), // Локализованная строка
       subtitle: Text('${selectedDate.toLocal()}'.split(' ')[0]),
       trailing: IconButton(
         icon: const Icon(Icons.calendar_today),

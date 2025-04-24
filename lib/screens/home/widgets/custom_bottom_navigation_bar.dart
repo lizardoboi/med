@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../routes.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -6,25 +7,24 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return BottomNavigationBar(
-      items: const [
+      items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.history),
-          label: 'History',
+          icon: const Icon(Icons.history),
+          label: localizations.history,
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.add),
-          label: 'Add',
+          icon: const Icon(Icons.add),
+          label: localizations.add,
         ),
       ],
       onTap: (index) async {
         if (index == 0) {
           Navigator.pushReplacementNamed(context, Routes.historyScreen);
         } else if (index == 1) {
-          await Navigator.pushNamed(
-            context,
-            Routes.addMedicineScreen,
-          );
+          await Navigator.pushNamed(context, Routes.addMedicineScreen);
         }
       },
     );

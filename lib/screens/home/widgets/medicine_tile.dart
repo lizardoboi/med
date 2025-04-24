@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../data/models/medicine_model.dart';
+import 'package:med/domain/models/medicine_model.dart';
+
 
 class MedicineTile extends StatelessWidget {
   final Medicine medicine;

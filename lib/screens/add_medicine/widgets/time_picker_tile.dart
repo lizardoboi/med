@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TimePickerTile extends StatelessWidget {
   final TimeOfDay selectedTime;
@@ -12,8 +13,10 @@ class TimePickerTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return ListTile(
-      title: const Text('Время приёма'),
+      title: Text(localizations.timeOfDay), // Переведено на локализованный текст
       subtitle: Text(selectedTime.format(context)),
       trailing: IconButton(
         icon: const Icon(Icons.access_time),
