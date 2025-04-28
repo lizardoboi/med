@@ -37,8 +37,6 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   @override
   void initState() {
     super.initState();
-    NotificationService.initialize();
-
     if (widget.medicine != null) {
       _existingMedicine = widget.medicine;
       _controller.text = _existingMedicine!.name;

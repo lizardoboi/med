@@ -2,24 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:med/domain/providers/medicine_provider.dart';
 import 'package:med/domain/providers/missed_dose_provider.dart';
 import 'package:med/domain/providers/profile_provider.dart';
+import 'package:med/utils/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'theme/theme_provider.dart';
 import 'routes.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // импорт локализаци
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-void main() => runApp(
-  MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => ThemeProvider()),
-      ChangeNotifierProvider(create: (_) => MedicineProvider()),
-      ChangeNotifierProvider(create: (_) => MissedDoseProvider()), // Добавили MissedDoseProvider
-      ChangeNotifierProvider(create: (_) => ProfileProvider()),
-    ],
-    child: const MyApp(),
-  ),
-);
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService.initialize(navigatorKey);
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => MedicineProvider()),
+        ChangeNotifierProvider(create: (_) => MissedDoseProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -47,9 +56,10 @@ class _MyAppState extends State<MyApp> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
+      navigatorKey: navigatorKey, // <- очень важно!
       title: 'Medication Reminder',
       theme: themeProvider.currentTheme,
-      locale: themeProvider.locale, // 👈 текущая выбранная локаль
+      locale: themeProvider.locale,
       supportedLocales: const [
         Locale('en'),
         Locale('ru'),

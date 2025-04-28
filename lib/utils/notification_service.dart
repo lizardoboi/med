@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:med/domain/models/missed_dose_model.dart';
 import 'package:med/domain/providers/missed_dose_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:timezone/data/latest.dart' as tzdata;
-
 
 class NotificationService {
-  static Future<void> initialize() async {
-    tzdata.initializeTimeZones();
+  static late GlobalKey<NavigatorState> navigatorKey;
+
+  static Future<void> initialize(GlobalKey<NavigatorState> key) async {
+    navigatorKey = key;
 
     await AwesomeNotifications().initialize(
-      null,
+      null, // Если есть иконка в ресурсах
       [
         NotificationChannel(
           channelKey: 'medicine_channel',
@@ -23,6 +23,47 @@ class NotificationService {
         ),
       ],
     );
+
+    // Установка обработчиков для нажатий на уведомления
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: onActionReceivedMethod,
+    );
+  }
+
+  static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+    final context = navigatorKey.currentContext;
+    if (context == null) {
+      print('Context is null');
+      return;
+    }
+
+    final payload = receivedAction.payload;
+    if (payload == null) return;
+
+    final name = payload['name'];
+    final timeStr = payload['time'];
+    if (name == null || timeStr == null) return;
+
+    final scheduledTime = DateTime.tryParse(timeStr);
+    if (scheduledTime == null) return;
+
+    final missedDoseProvider = Provider.of<MissedDoseProvider>(context, listen: false);
+
+    if (receivedAction.buttonKeyPressed == 'TAKEN') {
+      missedDoseProvider.addMissedDose(MissedDose(
+        medicineName: name,
+        scheduledTime: scheduledTime,
+        isTaken: true,
+      ));
+      print('Dose taken: $name at $scheduledTime');
+    } else if (receivedAction.buttonKeyPressed == 'NOT_TAKEN') {
+      missedDoseProvider.addMissedDose(MissedDose(
+        medicineName: name,
+        scheduledTime: scheduledTime,
+        isTaken: false,
+      ));
+      print('Dose not taken: $name at $scheduledTime');
+    }
   }
 
   static Future<void> scheduleNotification({
@@ -30,11 +71,10 @@ class NotificationService {
     required String body,
     required TimeOfDay time,
     required DateTime date,
-    required bool repeats, // <-- Добавлено
+    required bool repeats,
     int? id,
   }) async {
     final now = DateTime.now();
-
     DateTime scheduledDateTime = DateTime(
       date.year,
       date.month,
@@ -43,7 +83,6 @@ class NotificationService {
       time.minute,
     );
 
-    // Если время в прошлом — переносим на следующий день
     if (scheduledDateTime.isBefore(now)) {
       scheduledDateTime = scheduledDateTime.add(const Duration(days: 1));
     }
@@ -60,6 +99,16 @@ class NotificationService {
           'time': scheduledDateTime.toIso8601String(),
         },
       ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'TAKEN',
+          label: 'Принял',
+        ),
+        NotificationActionButton(
+          key: 'NOT_TAKEN',
+          label: 'Не принял',
+        ),
+      ],
       schedule: NotificationCalendar(
         year: scheduledDateTime.year,
         month: scheduledDateTime.month,
@@ -68,17 +117,12 @@ class NotificationService {
         minute: scheduledDateTime.minute,
         second: 0,
         millisecond: 0,
-        repeats: repeats, // <-- Добавлено
+        repeats: repeats,
         allowWhileIdle: true,
       ),
     );
   }
 
-  static Future<void> cancelNotification(int notificationId) async {
-    await AwesomeNotifications().cancel(notificationId);
-  }
-
-  /// 🔍 Проверка пропущенных уведомлений
   static Future<void> checkMissedNotifications(BuildContext context) async {
     final now = DateTime.now();
     final notifications = await AwesomeNotifications().listScheduledNotifications();
@@ -94,23 +138,27 @@ class NotificationService {
       final scheduledTime = DateTime.tryParse(timeStr);
       if (scheduledTime == null) continue;
 
-      final bool isMissed = now.isAfter(scheduledTime.add(const Duration(minutes: 10)));
+      final bool isMissed = now.isAfter(scheduledTime.add(const Duration(seconds: 1)));
 
       if (isMissed) {
-        // Добавляем пропущенную дозу
-        Provider.of<MissedDoseProvider>(context, listen: false).addMissedDose(
-          MissedDose(
-            medicineName: name,
-            scheduledTime: scheduledTime,
-          ),
+        print('Missed dose: $name at $scheduledTime');
+        final missedDoseProvider = Provider.of<MissedDoseProvider>(context, listen: false);
+        final missedDose = MissedDose(
+          medicineName: name,
+          scheduledTime: scheduledTime,
+          isTaken: false,
         );
+        missedDoseProvider.addMissedDose(missedDose);
 
-        // Отменяем старое уведомление
         final id = notification.content?.id;
         if (id != null) {
           await cancelNotification(id);
         }
       }
     }
+  }
+
+  static Future<void> cancelNotification(int notificationId) async {
+    await AwesomeNotifications().cancel(notificationId);
   }
 }

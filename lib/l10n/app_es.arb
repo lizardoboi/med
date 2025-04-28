@@ -50,6 +50,8 @@
   "missedDoseHistory": "Historial de dosis olvidadas",
   "clearHistory": "Borrar historial",
   "noMissedDoses": "No hay dosis olvidadas 🟢",
+  "takenDoses": "Dosis tomadas",
+  "notTakenDoses": "Dosis no tomadas",
   "scheduledAt": "Programado a",
   "timeOfDay": "Hora del día",
   "repeatDaily": "Repetir diariamente",

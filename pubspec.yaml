@@ -37,6 +37,6 @@ flutter_icons:
   android: true
   ios: true
   image_path: "assets/images/app_icon.png"
-  android_icon_size: 120 # Размер иконки для Android
+  android_icon_size: 200 # Размер иконки для Android
   ios_icon_size: 200 # Размер иконки для iOS
 

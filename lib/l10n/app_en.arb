@@ -50,6 +50,8 @@
   "missedDoseHistory": "Missed Dose History",
   "clearHistory": "Clear History",
   "noMissedDoses": "No missed doses 🟢",
+  "takenDoses": "Taken Doses",
+  "notTakenDoses": "Not Taken Doses",
   "scheduledAt": "Scheduled at",
   "timeOfDay": "Time of Day",
   "repeatDaily": "Repeat Daily",

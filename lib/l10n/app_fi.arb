@@ -50,6 +50,8 @@
   "missedDoseHistory": "Unohdetut annokset",
   "clearHistory": "Tyhjennä historia",
   "noMissedDoses": "Ei unohdettuja annoksia 🟢",
+  "takenDoses": "Otetut annokset",
+  "notTakenDoses": "Ei otetut annokset",
   "scheduledAt": "Aikataulutettu",
   "timeOfDay": "Aikaväli",
   "repeatDaily": "Toista päivittäin",
