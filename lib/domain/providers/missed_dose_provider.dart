@@ -1,38 +1,54 @@
 import 'package:flutter/material.dart';
 import '../models/missed_dose_model.dart';  // Убедитесь, что импортируете MissedDose
+import 'package:med/domain/models/profile_model.dart';
 
 class MissedDoseProvider with ChangeNotifier {
-  final List<MissedDose> _missedDoses = [];
+  final List<MissedDose> _allDoses = [];
+  Profile? _activeProfile;
 
-  List<MissedDose> get missedDoses => _missedDoses;
+  void setActiveProfile(Profile? profile) {
+    _activeProfile = profile;
+    notifyListeners();
+  }
 
-  // Добавляем пропущенную дозу в список
+  List<MissedDose> get missedDoses {
+    if (_activeProfile == null) return [];
+    return _allDoses
+        .where((dose) => dose.profileId == _activeProfile!.id)
+        .toList();
+  }
+
   void addMissedDose(MissedDose dose) {
-    _missedDoses.add(dose);
+    if (_activeProfile == null) return;
+    _allDoses.add(dose.copyWith(profileId: _activeProfile!.id));
     notifyListeners();
   }
 
-  // Очищаем историю
-  void clearHistory() {
-    _missedDoses.clear();
-    notifyListeners();
-  }
-
-  // Метод для отметки дозы как принятой
   void markDoseAsTaken(MissedDose dose) {
-    final index = _missedDoses.indexWhere((item) => item.scheduledTime == dose.scheduledTime && item.medicineName == dose.medicineName);
+    final index = _allDoses.indexWhere((item) =>
+    item.scheduledTime == dose.scheduledTime &&
+        item.medicineName == dose.medicineName &&
+        item.profileId == _activeProfile?.id);
     if (index != -1) {
-      _missedDoses[index].isTaken = true;
+      _allDoses[index] = _allDoses[index].copyWith(isTaken: true);
       notifyListeners();
     }
   }
 
-  // Метод для отметки дозы как пропущенной
   void markDoseAsMissed(MissedDose dose) {
-    final index = _missedDoses.indexWhere((item) => item.scheduledTime == dose.scheduledTime && item.medicineName == dose.medicineName);
+    final index = _allDoses.indexWhere((item) =>
+    item.scheduledTime == dose.scheduledTime &&
+        item.medicineName == dose.medicineName &&
+        item.profileId == _activeProfile?.id);
     if (index != -1) {
-      _missedDoses[index].isTaken = false;
+      _allDoses[index] = _allDoses[index].copyWith(isTaken: false);
       notifyListeners();
     }
+  }
+
+  void clearHistory() {
+    _allDoses.removeWhere((dose) => dose.profileId == _activeProfile?.id);
+    notifyListeners();
   }
 }
+

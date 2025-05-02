@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:med/domain/models/medicine_model.dart';
 import 'package:med/domain/providers/medicine_provider.dart';
+import 'package:med/domain/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
 import '../../utils/notification_service.dart';
 import 'widgets/condition_button.dart';
@@ -71,6 +72,15 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
 
   Future<void> _saveMedicine() async {
     final name = _controller.text;
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final activeProfile = profileProvider.activeProfile;
+
+    if (activeProfile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.noActiveProfile)),
+      );
+      return;
+    }
 
     if (name.isNotEmpty && _selectedCondition != null) {
       final isEditing = _existingMedicine != null;
@@ -87,6 +97,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
         reminder: isEditing ? _existingMedicine!.reminder : true,
         repeatDaily: _repeatDaily,
         notificationId: notificationId,
+        profileId: activeProfile.id,
       );
 
       final medicineProvider =

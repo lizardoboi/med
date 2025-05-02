@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:med/domain/models/missed_dose_model.dart';
 import 'package:med/domain/providers/missed_dose_provider.dart';
+import 'package:med/domain/providers/profile_provider.dart';
 import 'package:provider/provider.dart';
 
 class NotificationService {
@@ -11,7 +12,7 @@ class NotificationService {
     navigatorKey = key;
 
     await AwesomeNotifications().initialize(
-      null, // Если есть иконка в ресурсах
+      null,
       [
         NotificationChannel(
           channelKey: 'medicine_channel',
@@ -24,7 +25,6 @@ class NotificationService {
       ],
     );
 
-    // Установка обработчиков для нажатий на уведомления
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: onActionReceivedMethod,
     );
@@ -47,23 +47,25 @@ class NotificationService {
     final scheduledTime = DateTime.tryParse(timeStr);
     if (scheduledTime == null) return;
 
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final activeProfile = profileProvider.activeProfile;
+    if (activeProfile == null) {
+      print('No active profile set');
+      return;
+    }
+
     final missedDoseProvider = Provider.of<MissedDoseProvider>(context, listen: false);
 
-    if (receivedAction.buttonKeyPressed == 'TAKEN') {
-      missedDoseProvider.addMissedDose(MissedDose(
-        medicineName: name,
-        scheduledTime: scheduledTime,
-        isTaken: true,
-      ));
-      print('Dose taken: $name at $scheduledTime');
-    } else if (receivedAction.buttonKeyPressed == 'NOT_TAKEN') {
-      missedDoseProvider.addMissedDose(MissedDose(
-        medicineName: name,
-        scheduledTime: scheduledTime,
-        isTaken: false,
-      ));
-      print('Dose not taken: $name at $scheduledTime');
-    }
+    final dose = MissedDose(
+      medicineName: name,
+      scheduledTime: scheduledTime,
+      isTaken: receivedAction.buttonKeyPressed == 'TAKEN',
+      profileId: activeProfile.id,
+    );
+
+    missedDoseProvider.addMissedDose(dose);
+
+    print('${dose.isTaken ? 'Dose taken' : 'Dose not taken'}: $name at $scheduledTime');
   }
 
   static Future<void> scheduleNotification({
@@ -127,6 +129,12 @@ class NotificationService {
     final now = DateTime.now();
     final notifications = await AwesomeNotifications().listScheduledNotifications();
 
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final activeProfile = profileProvider.activeProfile;
+    if (activeProfile == null) return;
+
+    final missedDoseProvider = Provider.of<MissedDoseProvider>(context, listen: false);
+
     for (final notification in notifications) {
       final payload = notification.content?.payload;
       if (payload == null) continue;
@@ -138,16 +146,17 @@ class NotificationService {
       final scheduledTime = DateTime.tryParse(timeStr);
       if (scheduledTime == null) continue;
 
-      final bool isMissed = now.isAfter(scheduledTime.add(const Duration(seconds: 1)));
-
+      final isMissed = now.isAfter(scheduledTime.add(const Duration(seconds: 1)));
       if (isMissed) {
         print('Missed dose: $name at $scheduledTime');
-        final missedDoseProvider = Provider.of<MissedDoseProvider>(context, listen: false);
+
         final missedDose = MissedDose(
           medicineName: name,
           scheduledTime: scheduledTime,
           isTaken: false,
+          profileId: activeProfile.id,
         );
+
         missedDoseProvider.addMissedDose(missedDose);
 
         final id = notification.content?.id;

@@ -5,18 +5,20 @@ class Medicine {
   final String condition;
   final TimeOfDay time;
   final DateTime startDate;
-  final bool reminder;       // включено ли уведомление
-  final bool repeatDaily;    // повторять ли каждый день
+  final bool reminder;
+  final bool repeatDaily;
   final int notificationId;
+  final String profileId; // Добавлено
 
   Medicine({
     required this.name,
     required this.condition,
     required this.time,
     required this.startDate,
-    this.reminder = true,
-    this.repeatDaily = false,           // по умолчанию false
+    required this.reminder,
+    required this.repeatDaily,
     required this.notificationId,
+    required this.profileId, // Добавлено
   });
 
   Medicine copyWith({
@@ -27,6 +29,7 @@ class Medicine {
     bool? reminder,
     bool? repeatDaily,
     int? notificationId,
+    String? profileId,
   }) {
     return Medicine(
       name: name ?? this.name,
@@ -36,6 +39,7 @@ class Medicine {
       reminder: reminder ?? this.reminder,
       repeatDaily: repeatDaily ?? this.repeatDaily,
       notificationId: notificationId ?? this.notificationId,
+      profileId: profileId ?? this.profileId,
     );
   }
 }

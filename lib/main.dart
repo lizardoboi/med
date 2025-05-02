@@ -21,9 +21,27 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => MedicineProvider()),
-        ChangeNotifierProvider(create: (_) => MissedDoseProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
+
+        // MedicineProvider зависит от активного профиля
+        ChangeNotifierProxyProvider<ProfileProvider, MedicineProvider>(
+          create: (_) => MedicineProvider(),
+          update: (_, profileProvider, medicineProvider) {
+            medicineProvider ??= MedicineProvider();
+            medicineProvider.setActiveProfile(profileProvider.activeProfile);
+            return medicineProvider;
+          },
+        ),
+
+        // MissedDoseProvider зависит от активного профиля
+        ChangeNotifierProxyProvider<ProfileProvider, MissedDoseProvider>(
+          create: (_) => MissedDoseProvider(),
+          update: (_, profileProvider, missedDoseProvider) {
+            missedDoseProvider ??= MissedDoseProvider();
+            missedDoseProvider.setActiveProfile(profileProvider.activeProfile);
+            return missedDoseProvider;
+          },
+        ),
       ],
       child: const MyApp(),
     ),
@@ -56,7 +74,7 @@ class _MyAppState extends State<MyApp> {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
-      navigatorKey: navigatorKey, // <- очень важно!
+      navigatorKey: navigatorKey,
       title: 'Medication Reminder',
       theme: themeProvider.currentTheme,
       locale: themeProvider.locale,
