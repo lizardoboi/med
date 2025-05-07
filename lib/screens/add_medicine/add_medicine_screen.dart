@@ -21,9 +21,11 @@ class AddMedicineScreen extends StatefulWidget {
 
 class _AddMedicineScreenState extends State<AddMedicineScreen> {
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _dosageController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
   Medicine? _existingMedicine;
-  String? _selectedCondition;
+  List<String> _selectedConditions = []; // Изменяем на список
   TimeOfDay _selectedTime = TimeOfDay.now();
   DateTime _selectedDate = DateTime.now();
   bool _repeatDaily = false;
@@ -41,11 +43,21 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
     if (widget.medicine != null) {
       _existingMedicine = widget.medicine;
       _controller.text = _existingMedicine!.name;
-      _selectedCondition = _existingMedicine!.condition;
+      _dosageController.text = _existingMedicine!.dosage;
+      _notesController.text = _existingMedicine!.notes;
+      _selectedConditions = List.from(_existingMedicine!.condition.split(',')); // Изменяем на список
       _selectedTime = _existingMedicine!.time;
       _selectedDate = _existingMedicine!.startDate;
       _repeatDaily = _existingMedicine!.repeatDaily;
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _dosageController.dispose();
+    _notesController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickTime() async {
@@ -71,7 +83,10 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   }
 
   Future<void> _saveMedicine() async {
-    final name = _controller.text;
+    final name = _controller.text.trim();
+    final dosage = _dosageController.text.trim();
+    final notes = _notesController.text.trim();
+
     final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
     final activeProfile = profileProvider.activeProfile;
 
@@ -82,7 +97,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
       return;
     }
 
-    if (name.isNotEmpty && _selectedCondition != null) {
+    if (name.isNotEmpty && _selectedConditions.isNotEmpty) { // Убедитесь, что есть хотя бы одно выбранное условие
       final isEditing = _existingMedicine != null;
 
       final int notificationId = isEditing
@@ -91,17 +106,18 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
 
       final updatedMedicine = Medicine(
         name: name,
-        condition: _selectedCondition!,
+        condition: _selectedConditions.join(','), // Преобразуем список обратно в строку
         time: _selectedTime,
         startDate: _selectedDate,
         reminder: isEditing ? _existingMedicine!.reminder : true,
         repeatDaily: _repeatDaily,
         notificationId: notificationId,
         profileId: activeProfile.id,
+        dosage: dosage,
+        notes: notes,
       );
 
-      final medicineProvider =
-      Provider.of<MedicineProvider>(context, listen: false);
+      final medicineProvider = Provider.of<MedicineProvider>(context, listen: false);
 
       if (isEditing) {
         final originalIndex =
@@ -158,14 +174,37 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
+            TextField(
+              controller: _dosageController,
+              decoration: InputDecoration(
+                labelText: localizations.dosage,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            TextField(
+              controller: _notesController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: localizations.doctorNotes,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16.0),
             Wrap(
               spacing: 8.0,
               children: _conditions(context).map((condition) {
                 return ConditionButton(
                   label: condition,
-                  isActive: _selectedCondition == condition,
+                  isActive: _selectedConditions.contains(condition),
                   onChanged: (_) {
-                    setState(() => _selectedCondition = condition);
+                    setState(() {
+                      if (_selectedConditions.contains(condition)) {
+                        _selectedConditions.remove(condition); // Удалить, если уже выбрано
+                      } else {
+                        _selectedConditions.add(condition); // Добавить, если не выбрано
+                      }
+                    });
                   },
                 );
               }).toList(),

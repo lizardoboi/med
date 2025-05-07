@@ -55,5 +55,7 @@
   "scheduledAt": "Назначено",
   "timeOfDay": "Время приёма",
   "repeatDaily": "Повторять ежедневно",
-  "startDate": "Дата начала"
+  "startDate": "Дата начала",
+  "dosage": "Дозировка",
+  "doctorNotes": "Рекомендации врача"
 }

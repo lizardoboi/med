@@ -8,7 +8,9 @@ class Medicine {
   final bool reminder;
   final bool repeatDaily;
   final int notificationId;
-  final String profileId; // Добавлено
+  final String profileId;
+  final String dosage;
+  final String notes;
 
   Medicine({
     required this.name,
@@ -18,7 +20,9 @@ class Medicine {
     required this.reminder,
     required this.repeatDaily,
     required this.notificationId,
-    required this.profileId, // Добавлено
+    required this.profileId,
+    this.dosage = '',
+    this.notes = '',
   });
 
   Medicine copyWith({
@@ -30,6 +34,8 @@ class Medicine {
     bool? repeatDaily,
     int? notificationId,
     String? profileId,
+    String? dosage,
+    String? notes,
   }) {
     return Medicine(
       name: name ?? this.name,
@@ -40,6 +46,8 @@ class Medicine {
       repeatDaily: repeatDaily ?? this.repeatDaily,
       notificationId: notificationId ?? this.notificationId,
       profileId: profileId ?? this.profileId,
+      dosage: dosage ?? this.dosage,
+      notes: notes ?? this.notes,
     );
   }
 }

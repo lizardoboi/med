@@ -55,5 +55,7 @@
   "scheduledAt": "Programado a",
   "timeOfDay": "Hora del día",
   "repeatDaily": "Repetir diariamente",
-  "startDate": "Fecha de inicio"
+  "startDate": "Fecha de inicio",
+  "dosage": "Dosis",
+  "doctorNotes": "Notas del médico"
 }

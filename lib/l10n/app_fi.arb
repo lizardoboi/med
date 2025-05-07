@@ -55,5 +55,7 @@
   "scheduledAt": "Aikataulutettu",
   "timeOfDay": "Aikaväli",
   "repeatDaily": "Toista päivittäin",
-  "startDate": "Aloituspäivämäärä"
+  "startDate": "Aloituspäivämäärä",
+  "dosage": "Annostus",
+  "doctorNotes": "Lääkärin ohjeet"
 }

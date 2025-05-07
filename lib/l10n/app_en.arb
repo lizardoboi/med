@@ -55,5 +55,7 @@
   "scheduledAt": "Scheduled at",
   "timeOfDay": "Time of Day",
   "repeatDaily": "Repeat Daily",
-  "startDate": "Start Date"
+  "startDate": "Start Date",
+  "dosage": "Dosage",
+  "doctorNotes": "Doctor's Notes"
 }
