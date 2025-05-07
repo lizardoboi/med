@@ -1,8 +1,19 @@
+import 'package:hive/hive.dart';
 
-class MissedDose {
+part 'missed_dose_model.g.dart';
+
+@HiveType(typeId: 1)
+class MissedDose extends HiveObject {
+  @HiveField(0)
   final String medicineName;
+
+  @HiveField(1)
   final DateTime scheduledTime;
+
+  @HiveField(2)
   final bool isTaken;
+
+  @HiveField(3)
   final String profileId;
 
   MissedDose({

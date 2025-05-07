@@ -57,5 +57,6 @@
   "repeatDaily": "Repetir diariamente",
   "startDate": "Fecha de inicio",
   "dosage": "Dosis",
-  "doctorNotes": "Notas del médico"
+  "doctorNotes": "Notas del médico",
+  "okNotes": "Ok"
 }

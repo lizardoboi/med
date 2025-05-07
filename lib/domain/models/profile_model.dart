@@ -1,7 +1,19 @@
-class Profile {
+import 'package:hive/hive.dart';
+
+part 'profile_model.g.dart';
+
+@HiveType(typeId: 2)
+class Profile extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String name;
-  final String? avatarPath; // локальный путь к изображению
+
+  @HiveField(2)
+  final String? avatarPath; // путь к изображению
+
+  @HiveField(3)
   final List<String> medicineIds;
 
   Profile({

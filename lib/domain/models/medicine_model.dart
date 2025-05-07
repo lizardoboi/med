@@ -1,21 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
-class Medicine {
+part 'medicine_model.g.dart';
+
+@HiveType(typeId: 0)
+class Medicine extends HiveObject {
+  @HiveField(0)
   final String name;
+
+  @HiveField(1)
   final String condition;
-  final TimeOfDay time;
+
+  @HiveField(2)
+  final int hour;
+
+  @HiveField(3)
+  final int minute;
+
+  @HiveField(4)
   final DateTime startDate;
+
+  @HiveField(5)
   final bool reminder;
+
+  @HiveField(6)
   final bool repeatDaily;
+
+  @HiveField(7)
   final int notificationId;
+
+  @HiveField(8)
   final String profileId;
+
+  @HiveField(9)
   final String dosage;
+
+  @HiveField(10)
   final String notes;
 
   Medicine({
     required this.name,
     required this.condition,
-    required this.time,
+    required TimeOfDay time,
     required this.startDate,
     required this.reminder,
     required this.repeatDaily,
@@ -23,7 +49,10 @@ class Medicine {
     required this.profileId,
     this.dosage = '',
     this.notes = '',
-  });
+  })  : hour = time.hour,
+        minute = time.minute;
+
+  TimeOfDay get time => TimeOfDay(hour: hour, minute: minute);
 
   Medicine copyWith({
     String? name,

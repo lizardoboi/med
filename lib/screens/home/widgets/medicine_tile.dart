@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:med/domain/models/medicine_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MedicineTile extends StatelessWidget {
   final Medicine medicine;
@@ -17,6 +18,7 @@ class MedicineTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     final formattedDate = medicine.startDate.toLocal().toString().split(' ')[0];
     final time = medicine.time.format(context);
     final dosageText = medicine.dosage.isNotEmpty ? ', ${medicine.dosage}' : '';
@@ -42,7 +44,7 @@ class MedicineTile extends StatelessWidget {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('OK'),
+                    child: Text(localizations.okNotes),
                   ),
                 ],
               ),

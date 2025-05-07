@@ -47,15 +47,16 @@
   "searchMedicine": "Search Medicine",
   "history": "History",
   "add": "Add",
-  "missedDoseHistory": "Missed Dose History",
+  "missedDoseHistory": "Missed Medicine History",
   "clearHistory": "Clear History",
-  "noMissedDoses": "No missed doses 🟢",
-  "takenDoses": "Taken Doses",
-  "notTakenDoses": "Not Taken Doses",
+  "noMissedDoses": "No missed medicine 🟢",
+  "takenDoses": "Taken Medicine",
+  "notTakenDoses": "Not Taken Medicine",
   "scheduledAt": "Scheduled at",
   "timeOfDay": "Time of Day",
   "repeatDaily": "Repeat Daily",
   "startDate": "Start Date",
   "dosage": "Dosage",
-  "doctorNotes": "Doctor's Notes"
+  "doctorNotes": "Doctor's Notes",
+  "okNotes": "Ok"
 }

@@ -57,5 +57,6 @@
   "repeatDaily": "Toista päivittäin",
   "startDate": "Aloituspäivämäärä",
   "dosage": "Annostus",
-  "doctorNotes": "Lääkärin ohjeet"
+  "doctorNotes": "Lääkärin ohjeet",
+  "okNotes": "OK"
 }

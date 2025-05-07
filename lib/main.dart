@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:med/domain/models/medicine_model.dart';
+import 'package:med/domain/models/missed_dose_model.dart';
+import 'package:med/domain/models/profile_model.dart';
 import 'package:med/domain/providers/medicine_provider.dart';
 import 'package:med/domain/providers/missed_dose_provider.dart';
 import 'package:med/domain/providers/profile_provider.dart';
@@ -14,6 +18,19 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Инициализация Hive
+  await Hive.initFlutter();
+
+  // Регистрация адаптеров
+  Hive.registerAdapter(MedicineAdapter());
+  Hive.registerAdapter(MissedDoseAdapter());
+  Hive.registerAdapter(ProfileAdapter());
+
+  // Открытие коробок
+  await Hive.openBox<Medicine>('medicines');
+  await Hive.openBox<MissedDose>('missed_doses');
+  await Hive.openBox<Profile>('profiles');
 
   await NotificationService.initialize(navigatorKey);
 

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import '../models/missed_dose_model.dart';  // Убедитесь, что импортируете MissedDose
-import 'package:med/domain/models/profile_model.dart';
+import 'package:hive/hive.dart';
+import '../models/missed_dose_model.dart';
+import '../models/profile_model.dart';
 
 class MissedDoseProvider with ChangeNotifier {
-  final List<MissedDose> _allDoses = [];
+  late final Box<MissedDose> _box;
   Profile? _activeProfile;
+
+  MissedDoseProvider() {
+    _box = Hive.box<MissedDose>('missed_doses');
+  }
 
   void setActiveProfile(Profile? profile) {
     _activeProfile = profile;
@@ -13,42 +18,65 @@ class MissedDoseProvider with ChangeNotifier {
 
   List<MissedDose> get missedDoses {
     if (_activeProfile == null) return [];
-    return _allDoses
+    return _box.values
         .where((dose) => dose.profileId == _activeProfile!.id)
         .toList();
   }
 
   void addMissedDose(MissedDose dose) {
     if (_activeProfile == null) return;
-    _allDoses.add(dose.copyWith(profileId: _activeProfile!.id));
+    _box.add(dose.copyWith(profileId: _activeProfile!.id));
     notifyListeners();
   }
 
   void markDoseAsTaken(MissedDose dose) {
-    final index = _allDoses.indexWhere((item) =>
-    item.scheduledTime == dose.scheduledTime &&
-        item.medicineName == dose.medicineName &&
-        item.profileId == _activeProfile?.id);
-    if (index != -1) {
-      _allDoses[index] = _allDoses[index].copyWith(isTaken: true);
+    final key = _box.keys.firstWhere(
+          (k) {
+        final item = _box.get(k);
+        return item != null &&
+            item.scheduledTime == dose.scheduledTime &&
+            item.medicineName == dose.medicineName &&
+            item.profileId == _activeProfile?.id;
+      },
+      orElse: () => null,
+    );
+
+    if (key != null) {
+      final updated = dose.copyWith(isTaken: true);
+      _box.put(key, updated);
       notifyListeners();
     }
   }
 
   void markDoseAsMissed(MissedDose dose) {
-    final index = _allDoses.indexWhere((item) =>
-    item.scheduledTime == dose.scheduledTime &&
-        item.medicineName == dose.medicineName &&
-        item.profileId == _activeProfile?.id);
-    if (index != -1) {
-      _allDoses[index] = _allDoses[index].copyWith(isTaken: false);
+    final key = _box.keys.firstWhere(
+          (k) {
+        final item = _box.get(k);
+        return item != null &&
+            item.scheduledTime == dose.scheduledTime &&
+            item.medicineName == dose.medicineName &&
+            item.profileId == _activeProfile?.id;
+      },
+      orElse: () => null,
+    );
+
+    if (key != null) {
+      final updated = dose.copyWith(isTaken: false);
+      _box.put(key, updated);
       notifyListeners();
     }
   }
 
   void clearHistory() {
-    _allDoses.removeWhere((dose) => dose.profileId == _activeProfile?.id);
+    final keysToRemove = _box.keys.where((k) {
+      final dose = _box.get(k);
+      return dose?.profileId == _activeProfile?.id;
+    }).toList();
+
+    for (var k in keysToRemove) {
+      _box.delete(k);
+    }
+
     notifyListeners();
   }
 }
-
